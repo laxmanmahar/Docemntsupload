@@ -10,7 +10,6 @@ import pytesseract
 from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from PIL import Image
-import pytesseract
 
 
 class Signup(APIView):
@@ -97,9 +96,11 @@ class FileUpload(APIView):
                 elif "orig" in line:
                     surname = line.split("/")[-1].strip()
                 elif "Ethiopian" in line:
-                    nationality = line.split("National ib")[-1].split("Digital")[0].strip()
+                    nationality = (
+                        line.split("National ib")[-1].split("Digital")[0].strip()
+                    )
                 elif "Sep" in line:
-                    dob = line 
+                    dob = line
                 elif "Male" in line:
                     gender = line
                     print(gender)
@@ -110,11 +111,15 @@ class FileUpload(APIView):
                 surname=surname,
                 firstName=surname.split(",")[0],
                 nationality=country_obj,
-                gender=gender
+                gender=gender,
             )
 
             return Response(
-                {"extracted_text": extracted_text, "message": "Customer created successfully"}, status=status.HTTP_200_OK
+                {
+                    "extracted_text": extracted_text,
+                    "message": "Customer created successfully",
+                },
+                status=status.HTTP_200_OK,
             )
         else:
             return Response(
@@ -126,9 +131,7 @@ class GetCustomer(APIView):
     permission_classes = []
 
     def get(self, request, version, pk):
-        customer = get_object_or_404(
-            UserAppModel.Customer, pk=pk
-        )
+        customer = get_object_or_404(UserAppModel.Customer, pk=pk)
 
         serializer = UserAppSerializer.CustomerSerializer(
             customer, context={"request": request}
